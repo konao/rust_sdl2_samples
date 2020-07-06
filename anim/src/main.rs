@@ -50,7 +50,7 @@ fn main() {
 
     let mut dirInd: i32 = 0;    // 方向(0-3)
     let mut monster: i32 = 0;   // モンスター種類(0-4)
-    let step: i32 = 4;  // 移動ステップ値
+    let step: i32 = 6;  // 移動ステップ値
 
     let mut event_pump = sdl2_context.event_pump().unwrap();
     'running: loop {
