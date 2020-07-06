@@ -18,6 +18,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::rect::Rect;
 use sdl2::render::TextureCreator;
 use sdl2::image::LoadTexture;
+use sdl2::mouse::MouseButton;
 use std::time::Duration;
 
 fn main() {
@@ -50,7 +51,7 @@ fn main() {
 
     let mut dirInd: i32 = 0;    // 方向(0-3)
     let mut monster: i32 = 0;   // モンスター種類(0-4)
-    let step: i32 = 6;  // 移動ステップ値
+    let step: i32 = 4;  // 移動ステップ値
 
     let mut event_pump = sdl2_context.event_pump().unwrap();
     'running: loop {
@@ -94,6 +95,9 @@ fn main() {
                 | Event::KeyDown {
                     keycode: Some(Keycode::Escape), ..
                 } => break 'running,
+                // | Event::MouseButtonDown => {
+                //     println!("x={}, y={}", event.x, event.y);
+                // },
                 _ => {}
             }
         }
@@ -114,6 +118,14 @@ fn main() {
         canvas.copy(&image_texture, Some(src), Some(dest)).expect("copy texture to canvas failed");
 
         canvas.present();
+
+        // get mouse state
+        let mstate = event_pump.mouse_state();
+        if mstate.left() {
+            // left button is pressing
+            println!("left button pressed ({}, {})", mstate.x(), mstate.y());
+        }
+
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
 }
