@@ -1,0 +1,12 @@
+[package]
+name = "asteroid"
+version = "0.1.0"
+authors = ["Takuya Sekikawa <konao235@gmail.com>"]
+
+[dependencies]
+# このバージョンでないと成功しなかった
+# ("0.34.2"が最新だったが、unstable editionとか何とか言われてコンパイルできなかった)
+sdl2 = "0.30.0"
+
+[features]
+default = ["sdl2/image"]
