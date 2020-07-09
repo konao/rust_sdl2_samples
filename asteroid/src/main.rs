@@ -19,7 +19,9 @@ fn deg2rad(x: f64) -> f64 {
     return x * 3.14159265 / 180.0;
 }
 
+// ---------------------------------
 // 宇宙船
+// ---------------------------------
 struct MyShip {
     // 位置
     x: f64,
@@ -34,7 +36,7 @@ struct MyShip {
 impl MyShip {
     // 第1引数に &self, self を取らないメソッドはクラスメソッド 
     // (Rust用語では Associated Method)とみなされる
-    fn new(_x: f64, _y: f64, _radius: f64, _rot: f64, _maxSpeed: f64) -> MyShip {
+    fn new(_x: f64, _y: f64, _radius: f64, _rot: f64, _maxSpeed: f64) -> Self {
         return MyShip {
             x: _x,
             y: _y,
@@ -116,8 +118,54 @@ impl MyShip {
         let ps = [p1, p2, p3, p1];
         let _ = canvas.draw_lines(ps.as_ref()); // [Point]から&[Point]を生成する
     }
+
+    fn fire(&self) -> Bullet {
+        let x = self.x;
+        let y = self.y;
+        let vx = self.rotation.cos() * 5.0;
+        let vy = self.rotation.sin() * 5.0;
+
+        // println!("new bullet : p=({}, {}), v=({}, {})", x, y, vx, vy);
+
+        return Bullet::new(x, y, vx, vy);
+    }
 }
 
+// ---------------------------------
+//  弾丸
+// ---------------------------------
+struct Bullet {
+    // 位置
+    x: f64,
+    y: f64,
+    vx: f64,    // 速度ベクトル
+    vy: f64,    // 速度ベクトル
+    valid: bool // 有効ならtrue
+}
+
+impl Bullet {
+    fn new(_x: f64, _y: f64, _vx: f64, _vy: f64) -> Self {
+        return Bullet {
+            x: _x,
+            y: _y,
+            vx: _vx,
+            vy: _vy,
+            valid: true
+        };
+    }
+
+    fn draw(&self, canvas: &mut Canvas<Window>) {
+        canvas.set_draw_color(Color::RGB(255, 255, 255));
+
+        let p: Point = Point::new(self.x as i32, self.y as i32);
+
+        let _ = canvas.draw_point(p); // [Point]から&[Point]を生成する
+    }
+}
+
+// ---------------------------------
+//  メインルーチン
+// ---------------------------------
 fn main() {
     let sdl2_context = sdl2::init().unwrap();
     let video_subsystem = sdl2_context.video().unwrap();
@@ -147,6 +195,8 @@ fn main() {
         MAX_SPEED   // 最大速さ
     );
 
+    let mut bullets = Vec::new();
+
     let mut event_pump = sdl2_context.event_pump().unwrap();
     'running: loop {
         for event in event_pump.poll_iter() {
@@ -170,7 +220,7 @@ fn main() {
                 | Event::KeyDown {
                     keycode: Some(Keycode::Space), ..
                 } => {
-                    // fire
+                    bullets.push(myShip.fire());  // 弾発射
                 }
                 | Event::KeyDown {
                     keycode: Some(Keycode::Escape), ..
@@ -188,6 +238,33 @@ fn main() {
 
         // draw ship
         myShip.draw(&mut canvas);
+
+        // update bullets
+        let wf = (width as i32) as f64;
+        let hf = (height as i32) as f64;
+        for bullet in &mut bullets {
+            if bullet.valid {
+                // 有効なら進める
+                let newx = bullet.x + bullet.vx;
+                let newy = bullet.y + bullet.vy;
+
+                if (newx < 0.0) || (newy < 0.0) || (newx > wf) || (newy > hf) {
+                    // 画面から外れた．無効にする
+                    // （本来は消すべきだが、dropの仕方よよくわからないのでフラグを使って無ににする）
+                    bullet.valid = false;
+                } else {
+                    bullet.x = newx;
+                    bullet.y = newy;
+                }
+            }
+        }
+
+        // draw bullets
+        for bullet in &bullets {
+            if bullet.valid {
+                bullet.draw(&mut canvas);
+            }
+        }
 
         // show backbuffer
         canvas.present();
