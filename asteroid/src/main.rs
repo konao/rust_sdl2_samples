@@ -2,7 +2,7 @@
 //  Asteroid
 //  Simple Application with SDL2 on Rust
 //
-//  2020/7/7 konao
+//  2020/7/9 konao
 // *****************************************************************
 #![allow(non_snake_case)]
 extern crate sdl2;
@@ -159,7 +159,7 @@ impl Bullet {
 
         let p: Point = Point::new(self.x as i32, self.y as i32);
 
-        let _ = canvas.draw_point(p); // [Point]から&[Point]を生成する
+        let _ = canvas.draw_point(p);
     }
 }
 
@@ -250,7 +250,7 @@ fn main() {
 
                 if (newx < 0.0) || (newy < 0.0) || (newx > wf) || (newy > hf) {
                     // 画面から外れた．無効にする
-                    // （本来は消すべきだが、dropの仕方よよくわからないのでフラグを使って無ににする）
+                    // （本来は消すべきだが、dropの仕方がよくわからないのでフラグを使って無効にする）
                     bullet.valid = false;
                 } else {
                     bullet.x = newx;
