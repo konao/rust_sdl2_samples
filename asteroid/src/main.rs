@@ -6,6 +6,7 @@
 // *****************************************************************
 #![allow(non_snake_case)]
 extern crate sdl2;
+extern crate rand;
 
 use sdl2::video::Window;
 use sdl2::render::Canvas;
@@ -14,6 +15,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Point;
 use std::time::Duration;
+use rand::Rng;
 
 fn deg2rad(x: f64) -> f64 {
     return x * 3.14159265 / 180.0;
@@ -164,6 +166,116 @@ impl Bullet {
 }
 
 // ---------------------------------
+//  小惑星
+// ---------------------------------
+struct Asteroid {
+    // 位置
+    x: f64,
+    y: f64,
+    vx: f64,    // 速度ベクトル
+    vy: f64,
+    rot: f64, // 回転角
+    drot: f64,    // 回転速度
+    size: i32,  // サイズ
+    shape: Vec<(f64, f64)>, // 小惑星の形
+    valid: bool // 有効ならtrue
+}
+
+impl Asteroid {
+    fn new(_size: i32, _width: u32, _height: u32) -> Self {
+        // 小惑星を生成
+        // 位置、速度、形状は乱数で決める
+        let mut shape: Vec<(f64, f64)> = Vec::new();
+
+        let mut rng = rand::thread_rng();
+
+        // 位置を生成
+        let x = rng.gen::<f64>() * (_width as f64);
+        let y = rng.gen::<f64>() * (_height as f64);
+
+        // 速度を生成
+        let vx = rng.gen::<f64>() * 4.0 - 2.0;
+        let vy = rng.gen::<f64>() * 4.0 - 2.0;
+
+        // 形を生成
+        let r = (_size * 2) as f64;
+        for i in 0.._size {
+            let theta = (i as f64) * 3.14159265 * 2.0 / (_size as f64);
+            let x: f64 = (r + (rng.gen::<f64>() * 20.0 - 10.0)) * theta.cos();
+            let y: f64 = (r + (rng.gen::<f64>() * 20.0 - 10.0)) * theta.sin();
+            shape.push((x, y));
+        }
+
+        let rot = rng.gen::<f64>() * 3.14159265 * 2.0;
+        let drot = (rng.gen::<f64>() - 0.5) * 3.14159265 / 180.0 * 5.0;
+
+        return Asteroid {
+            x: x,
+            y: y,
+            vx: vx,
+            vy: vy,
+            rot: rot,
+            drot: drot,
+            size: _size,
+            shape: shape,
+            valid: true
+        };
+    }
+
+    fn update(&mut self, width: u32, height: u32) {
+        let wf = (width as i32) as f64;
+        let hf = (height as i32) as f64;
+
+        // 位こ更新
+        self.x += self.vx;
+        self.y += self.vy;
+
+        self.x = if self.x<0.0 {
+            self.x + wf
+        } else if self.x>=wf {
+            self.x - wf
+        } else { 
+            self.x 
+        };
+
+        self.y = if self.y<0.0 {
+            self.y + hf
+        } else if self.y>=hf {
+            self.y - hf
+        } else {
+            self.y 
+        };
+
+        // 回転こ更新
+        let pi2 = 3.14159265 * 2.0;
+        self.rot += self.drot;
+        self.rot = if self.rot<0.0 {
+            self.rot + pi2
+        } else if self.rot>pi2 {
+            self.rot - pi2
+        } else {
+            self.rot
+        }
+    }
+
+    fn draw(&self, canvas: &mut Canvas<Window>) {
+        canvas.set_draw_color(Color::RGB(255, 255, 255));
+
+        // draw_lines()で3角形を描く
+        let mut ps = Vec::new();
+
+        for i in 0..self.shape.len()+1 {
+            let j = if i==self.shape.len() { 0 } else { i };
+            let x = self.x + self.shape[j].0 * self.rot.cos() - self.shape[j].1 * self.rot.sin();
+            let y = self.y + self.shape[j].0 * self.rot.sin() + self.shape[j].1 * self.rot.cos();
+            ps.push(Point::new(x as i32, y as i32));
+        }
+
+        let _ = canvas.draw_lines(ps.as_ref()); // [Point]から&[Point]を生成する
+    }
+}
+
+// ---------------------------------
 //  メインルーチン
 // ---------------------------------
 fn main() {
@@ -195,7 +307,25 @@ fn main() {
         MAX_SPEED   // 最大速さ
     );
 
+    // 弾丸を保持するベクトル
     let mut bullets = Vec::new();
+
+    // 小惑星を保持するベクトル
+    let mut asteroids = Vec::new();
+
+    // 小惑星を生成
+    let mut rng = rand::thread_rng();
+    for _ in 1..10 {
+        let size = (((rng.gen::<f64>() * 15.0) as i32) + 3) * 2;
+        let ax = (rng.gen::<f64>() * (width as f64)) as u32;
+        let ay = (rng.gen::<f64>() * (height as f64)) as u32;
+        let asteroid = Asteroid::new(
+            size,
+            ax,
+            ay
+        );
+        asteroids.push(asteroid);
+    }
 
     let mut event_pump = sdl2_context.event_pump().unwrap();
     'running: loop {
@@ -263,6 +393,14 @@ fn main() {
         for bullet in &bullets {
             if bullet.valid {
                 bullet.draw(&mut canvas);
+            }
+        }
+
+        // update & draw asteroids
+        for asteroid in &mut asteroids {
+            if asteroid.valid {
+                asteroid.update(width, height);
+                asteroid.draw(&mut canvas);
             }
         }
 

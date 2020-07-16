@@ -8,5 +8,7 @@ authors = ["Takuya Sekikawa <konao235@gmail.com>"]
 # ("0.34.2"が最新だったが、unstable editionとか何とか言われてコンパイルできなかった)
 sdl2 = "0.30.0"
 
+rand = "0.6"
+
 [features]
 default = ["sdl2/image"]
