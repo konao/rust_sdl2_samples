@@ -226,7 +226,7 @@ impl Asteroid {
         let wf = (width as i32) as f64;
         let hf = (height as i32) as f64;
 
-        // 位こ更新
+        // update position
         self.x += self.vx;
         self.y += self.vy;
 
@@ -246,7 +246,7 @@ impl Asteroid {
             self.y 
         };
 
-        // 回転こ更新
+        // update rotation
         let pi2 = 3.14159265 * 2.0;
         self.rot += self.drot;
         self.rot = if self.rot<0.0 {
