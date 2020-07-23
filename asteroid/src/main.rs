@@ -8,12 +8,9 @@
 extern crate sdl2;
 extern crate rand;
 
-use sdl2::video::Window;
-use sdl2::render::Canvas;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::rect::Point;
 use std::time::Duration;
 use rand::Rng;
 
@@ -22,7 +19,6 @@ extern crate asteroid;
 
 use asteroid::Util;
 use asteroid::MyShip;
-use asteroid::Bullet;
 use asteroid::Asteroid;
 
 // ---------------------------------
