@@ -12,7 +12,6 @@ use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
-use rand::Rng;
 
 // このアプリ自身のクレート(lib.rsで公開しているもの)を使う
 extern crate asteroid;
@@ -60,11 +59,8 @@ fn main() {
     let mut asteroids = Vec::new();
 
     // 小惑星を生成
-    let mut rng = rand::thread_rng();
-    for _ in 1..10 {
-        let size = (((rng.gen::<f64>() * 15.0) as i32) + 3) * 2;
-        let asteroid = Asteroid::Asteroid::gen(
-            size,
+    for _ in 0..10 {
+        let asteroid = Asteroid::Asteroid::genRand(
             width,
             height
         );

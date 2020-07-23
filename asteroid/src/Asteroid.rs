@@ -23,7 +23,7 @@ pub struct Asteroid {
 }
 
 impl Asteroid {
-    pub fn new(_size: i32, x: f64, y: f64) -> Self {
+    pub fn new(size: i32, x: f64, y: f64) -> Self {
         use rand::{self, Rng};  // ここにselfがないと下の(1)でエラーになる
         // https://stackoverflow.com/questions/52216426/access-to-external-crates-from-module
 
@@ -38,16 +38,16 @@ impl Asteroid {
         let vy = rng.gen::<f64>() * 4.0 - 2.0;
 
         // 形を生成
-        let r = (_size * 2) as f64;
+        let r = (size * 2) as f64;
         let mut rsum: f64 = 0.0;
-        for i in 0.._size {
-            let theta = (i as f64) * 3.14159265 * 2.0 / (_size as f64);
+        for i in 0..size {
+            let theta = (i as f64) * 3.14159265 * 2.0 / (size as f64);
             let x: f64 = (r + (rng.gen::<f64>() * 20.0 - 10.0)) * theta.cos();
             let y: f64 = (r + (rng.gen::<f64>() * 20.0 - 10.0)) * theta.sin();
             shape.push((x, y));
             rsum += (x*x+y*y).sqrt();
         }
-        let meanRadius = rsum/(_size as f64); // 半径の平均値
+        let meanRadius = rsum/(size as f64); // 半径の平均値
 
         let rot = rng.gen::<f64>() * 3.14159265 * 2.0;
         let drot = (rng.gen::<f64>() - 0.5) * 3.14159265 / 180.0 * 5.0;
@@ -59,7 +59,7 @@ impl Asteroid {
             vy: vy,
             rot: rot,
             drot: drot,
-            size: _size,
+            size: size,
             shape: shape,
             meanRadius: meanRadius,
             valid: true
@@ -67,7 +67,7 @@ impl Asteroid {
     }
 
     // ランダムに生成
-    pub fn gen(_size: i32, _width: u32, _height: u32) -> Self {
+    pub fn genRand(_width: u32, _height: u32) -> Self {
         use rand::{self, Rng};
 
         // 小惑星を生成
@@ -75,6 +75,9 @@ impl Asteroid {
         let mut shape: Vec<(f64, f64)> = Vec::new();
 
         let mut rng = rand::thread_rng();
+
+        // サイズを生成
+        let size = (((rng.gen::<f64>() * 15.0) as i32) + 3) * 2;
 
         // 位置を生成
         let x = rng.gen::<f64>() * (_width as f64);
@@ -85,16 +88,16 @@ impl Asteroid {
         let vy = rng.gen::<f64>() * 4.0 - 2.0;
 
         // 形を生成
-        let r = (_size * 2) as f64;
+        let r = (size * 2) as f64;
         let mut rsum: f64 = 0.0;
-        for i in 0.._size {
-            let theta = (i as f64) * 3.14159265 * 2.0 / (_size as f64);
+        for i in 0..size {
+            let theta = (i as f64) * 3.14159265 * 2.0 / (size as f64);
             let x: f64 = (r + (rng.gen::<f64>() * 20.0 - 10.0)) * theta.cos();
             let y: f64 = (r + (rng.gen::<f64>() * 20.0 - 10.0)) * theta.sin();
             shape.push((x, y));
             rsum += (x*x+y*y).sqrt();
         }
-        let meanRadius = rsum/(_size as f64); // 半径の平均値
+        let meanRadius = rsum/(size as f64); // 半径の平均値
 
         let rot = rng.gen::<f64>() * 3.14159265 * 2.0;
         let drot = (rng.gen::<f64>() - 0.5) * 3.14159265 / 180.0 * 5.0;
@@ -106,7 +109,7 @@ impl Asteroid {
             vy: vy,
             rot: rot,
             drot: drot,
-            size: _size,
+            size: size,
             shape: shape,
             meanRadius: meanRadius,
             valid: true
