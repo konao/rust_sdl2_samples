@@ -17,6 +17,7 @@ use sdl2::rect::Point;
 use std::time::Duration;
 use rand::Rng;
 
+// このアプリ自身のクレート(lib.rsで公開しているもの)を使う
 extern crate asteroid;
 
 use asteroid::Util;
@@ -66,10 +67,7 @@ fn main() {
     let mut rng = rand::thread_rng();
     for _ in 1..10 {
         let size = (((rng.gen::<f64>() * 15.0) as i32) + 3) * 2;
-        // let ax = (rng.gen::<f64>() * (width as f64)) as u32;
-        // let ay = (rng.gen::<f64>() * (height as f64)) as u32;
         let asteroid = Asteroid::Asteroid::gen(
-            // &mut rng,
             size,
             width,
             height

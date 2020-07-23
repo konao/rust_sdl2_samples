@@ -76,4 +76,3 @@ impl Bullet {
         let _ = canvas.draw_point(p);
     }
 }
-
