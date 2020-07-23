@@ -179,7 +179,7 @@ impl Asteroid {
     pub fn draw(&self, canvas: &mut Canvas<Window>) {
         canvas.set_draw_color(Color::RGB(255, 255, 255));
 
-        // draw_lines()で3角形を描く
+        // draw_lines()で隕石を描く
         let mut ps = Vec::new();
 
         for i in 0..self.shape.len()+1 {
@@ -193,7 +193,7 @@ impl Asteroid {
     }
 
     // 衝突判定
-    // (tx, ty) ... 衝突判た対象座標
+    // (tx, ty) ... 衝突判定対象座標
     pub fn hitTest(&self, tx: f64, ty: f64) -> bool {
         let tdx = tx - self.x;
         let tdy = ty - self.y;
