@@ -13,7 +13,8 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
-// このアプリ自身のクレート(lib.rsで公開しているもの)を使う
+// このアプリ自身のクレート(lib.rsで公開しているもの)を使う．
+// クレート名はCargo.tomlの[package]のnameで指定したものになる．
 extern crate asteroid;
 
 use asteroid::Util;
