@@ -3,7 +3,8 @@
 extern crate sdl2;
 extern crate rand;
 
-pub mod Util;
+pub mod Game;
 pub mod MyShip;
 pub mod Bullet;
 pub mod Asteroid;
+pub mod Util;
