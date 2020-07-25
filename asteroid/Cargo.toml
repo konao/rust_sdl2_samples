@@ -11,4 +11,4 @@ sdl2 = "0.30.0"
 rand = "0.6"
 
 [features]
-default = ["sdl2/image"]
+default = ["sdl2/image", "sdl2/ttf"]

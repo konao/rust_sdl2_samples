@@ -8,7 +8,7 @@
 extern crate sdl2;
 extern crate rand;
 
-use sdl2::pixels::Color;
+use sdl2::render::TextureCreator;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
@@ -35,6 +35,11 @@ fn main() {
         .unwrap();
 
     let mut canvas = window.into_canvas().build().unwrap();
+
+    // init font stuff
+    let ttf_context = sdl2::ttf::init().expect("failed to init SDL TTF");
+    let font = ttf_context.load_font("assets/arial.ttf", 128).expect("failed to load font");
+    let texture_creator: TextureCreator<_> = canvas.texture_creator();
 
     let mut game = Game::Game::new();
 
@@ -64,6 +69,11 @@ fn main() {
                     game.spacePressed();
                 }
                 | Event::KeyDown {
+                    keycode: Some(Keycode::Return), ..
+                } => {
+                    game.enterPressed();
+                }
+                | Event::KeyDown {
                     keycode: Some(Keycode::Escape), ..
                 } => break 'running,
                 _ => {}
@@ -71,7 +81,7 @@ fn main() {
         }
 
         // update scene
-        game.update(&mut canvas, width, height);
+        game.update(&mut canvas, &font, &texture_creator, width, height);
 
         // show backbuffer
         canvas.present();

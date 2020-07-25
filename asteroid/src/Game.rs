@@ -1,9 +1,9 @@
 #![allow(non_snake_case)]
 
-use sdl2::video::Window;
-use sdl2::render::Canvas;
+use sdl2::video::{Window, WindowContext};
+use sdl2::render::{Canvas, TextureCreator};
 use sdl2::pixels::Color;
-use sdl2::rect::Point;
+use sdl2::ttf::Font;
 
 use MyShip;
 use Asteroid;
@@ -17,6 +17,7 @@ pub enum GameState {
     TITLE,
     START,
     PLAY,
+    EXPLODED,
     DEAD,
     GAMEOVER
 }
@@ -32,21 +33,24 @@ pub struct Game {
 
     myShip: Option<MyShip::MyShip>,
     bullets: Vec<Bullet::Bullet>,
-    asteroids: Vec<Asteroid::Asteroid>
+    asteroids: Vec<Asteroid::Asteroid>,
+
+    gameOverDisplayCount: i32
 }
 
 impl Game {
     pub fn new() -> Self {
         return Game {
-            state: GameState::START,
+            state: GameState::TITLE,
             score: 0,
-            nShips: 5,
+            nShips: 3,  // 宇宙船の個数
             nAsteroids: 0,
             MAX_SPEED: 15.0,    // 最大速度
             D_ROT: Util::deg2rad(5.0),  // 回転変位
             myShip: None,
             bullets: Vec::new(),
-            asteroids: Vec::new()
+            asteroids: Vec::new(),
+            gameOverDisplayCount: 0
         };
     }
 
@@ -106,7 +110,7 @@ impl Game {
         match self.state {
             GameState::TITLE => {
                 // ゲーム開始
-
+                self.state = GameState::START;
             }
             _ => {
 
@@ -145,10 +149,29 @@ impl Game {
         }
     }
 
-    pub fn update(&mut self, canvas: &mut Canvas<Window>, width: u32, height: u32) {
+    pub fn update<'a>(
+        &mut self,
+        canvas: &mut Canvas<Window>,
+        font: &Font,
+        texture_creator: &'a TextureCreator<WindowContext>,
+        width: u32, height: u32
+    ) {
         match self.state {
             GameState::TITLE => {
                 // ゲーム開始(Enter)または終了(Escape)まで待機
+
+                // clear canvas
+                canvas.set_draw_color(Color::RGB(0, 0, 0)); // black
+                canvas.clear();
+
+                let wl: u32 = 50;
+                let hl: u32 = 70;
+                let wm: u32 = 20;
+                let hm: u32 = 30;
+
+                Util::textOut(canvas, &font, &texture_creator, "Asteroid", 0, 255, 128, (width as i32)/2-(wl as i32)*4, (height as i32)/2-40, wl, hl);
+                Util::textOut(canvas, &font, &texture_creator, "Press Enter to start", 0, 255, 128, (width as i32)/2-200, (height as i32)/2+100, wm, hm);
+                Util::textOut(canvas, &font, &texture_creator, "Escape to exit", 0, 255, 128, (width as i32)/2-200, (height as i32)/2+140, wm, hm);
             }
             GameState::START => {
                 // スコアをクリア
@@ -160,6 +183,7 @@ impl Game {
             }
             GameState::PLAY => {
                 // ゲームプレイ中
+
                 // clear canvas
                 canvas.set_draw_color(Color::RGB(0, 0, 0)); // black
                 canvas.clear();
@@ -168,7 +192,20 @@ impl Game {
                 if let Some(ref mut myShip) = self.myShip {
                     // update position
                     myShip.updatePos(width, height);
-            
+
+                    let shipX = myShip.getX();
+                    let shipY = myShip.getY();
+
+                    // 衝突判定
+                    for asteroid in &mut self.asteroids {
+                        if asteroid.getValid() && asteroid.hitTest(shipX, shipY) {
+                            // 小惑星に当たった
+                            myShip.clearExplosionAnimCount();
+                            self.state = GameState::EXPLODED;
+                            break;
+                        }
+                    }
+                    
                     // draw ship
                     myShip.draw(canvas);
                 }
@@ -197,6 +234,9 @@ impl Game {
                                     // 小惑星に当たった
                                     asteroid.setValid(false);
                                     bullet.setValid(false);
+
+                                    // スコア加算
+                                    self.score += 10;
         
                                     // 小惑星を分裂させる
                                     if asteroid.getSize() >= 6 {
@@ -230,6 +270,40 @@ impl Game {
                         asteroid.draw(canvas);
                     }
                 }
+
+                // draw score
+                Util::textOut(canvas, &font, &texture_creator, &format!("Score: {}", self.score), 0, 255, 128, 100, 10, 15, 30);
+                Util::textOut(canvas, &font, &texture_creator, &format!("Ships Left: {}", self.nShips), 0, 255, 128, (width as i32) - 250, 10, 15, 30);
+            }
+            GameState::EXPLODED => {
+                // clear canvas
+                canvas.set_draw_color(Color::RGB(0, 0, 0)); // black
+                canvas.clear();
+
+                if let Some(ref mut myShip) = self.myShip {
+                    // 宇宙船破壊アニメーション
+                    // draw ship
+                    myShip.drawExplosion(canvas);
+
+                    // 破壊アニメーションカウント更新
+                    let newAnimCount = myShip.updateExplosionAnimCount();
+                    if newAnimCount >= 50 {
+                        // 爆発アニメーション終了
+                        self.state = GameState::DEAD;
+                    }
+                }
+
+                // update & draw asteroids
+                for asteroid in &mut self.asteroids {
+                    if asteroid.getValid() {
+                        asteroid.update(width, height);
+                        asteroid.draw(canvas);
+                    }
+                }
+
+                // draw score
+                Util::textOut(canvas, &font, &texture_creator, &format!("Score: {}", self.score), 0, 255, 128, 100, 10, 15, 30);
+                Util::textOut(canvas, &font, &texture_creator, &format!("Ships Left: {}", self.nShips), 0, 255, 128, (width as i32) - 250, 10, 15, 30);
             }
             GameState::DEAD => {
                 // 宇宙船破壊された
@@ -237,14 +311,38 @@ impl Game {
                 if self.nShips <=0 {
                     // 残り宇宙船なし．ゲームオーバー
                     self.state = GameState::GAMEOVER;
+                    self.gameOverDisplayCount = 0;
                 } else {
                     // まだ残りある．リスタート
                     // init();
                     self.state = GameState::PLAY;
                 }
             }
-            _ => {
+            GameState::GAMEOVER => {
+                // clear canvas
+                canvas.set_draw_color(Color::RGB(0, 0, 0)); // black
+                canvas.clear();
 
+                let wl: i32 = 50;
+                let hl: i32 = 70;
+                let wm: i32 = 20;
+                let hm: i32 = 30;
+                Util::textOut(canvas, &font, &texture_creator, "Game Over", 0, 255, 128, (width as i32)/2-wl*4, (height as i32)/2-hl/2, wl as u32, hl as u32);
+                Util::textOut(canvas, &font, &texture_creator, &format!("Score: {}", self.score), 0, 255, 128, (width as i32)/2-wm*5, (height as i32)/2+hm*2, 15, 30);
+
+                // update & draw asteroids
+                for asteroid in &mut self.asteroids {
+                    if asteroid.getValid() {
+                        asteroid.update(width, height);
+                        asteroid.draw(canvas);
+                    }
+                }
+
+                self.gameOverDisplayCount += 1;
+                if self.gameOverDisplayCount >= 300 {
+                    // タイトル画面に戻る
+                    self.state = GameState::TITLE;
+                }
             }
         }
     }
