@@ -164,14 +164,16 @@ impl Game {
                 canvas.set_draw_color(Color::RGB(0, 0, 0)); // black
                 canvas.clear();
 
-                let wl: u32 = 50;
-                let hl: u32 = 70;
+                let wl: u32 = 120;
+                let hl: u32 = 150;
                 let wm: u32 = 20;
                 let hm: u32 = 30;
 
-                Util::textOut(canvas, &font, &texture_creator, "Asteroid", 0, 255, 128, (width as i32)/2-(wl as i32)*4, (height as i32)/2-40, wl, hl);
-                Util::textOut(canvas, &font, &texture_creator, "Press Enter to start", 0, 255, 128, (width as i32)/2-200, (height as i32)/2+100, wm, hm);
-                Util::textOut(canvas, &font, &texture_creator, "Escape to exit", 0, 255, 128, (width as i32)/2-200, (height as i32)/2+140, wm, hm);
+                Util::textOut(canvas, &font, &texture_creator, "Asteroid", 0, 255, 128, (width as i32)/2-(wl as i32)*4, (height as i32)/2-250, wl, hl);
+                Util::textOut(canvas, &font, &texture_creator, "Arrow Keys: Ship Control", 0, 255, 128, (width as i32)/2-250, (height as i32)/2+20, wm, hm);
+                Util::textOut(canvas, &font, &texture_creator, "Space Bar: Fire Bullet", 0, 255, 128, (width as i32)/2-230, (height as i32)/2+60, wm, hm);
+                Util::textOut(canvas, &font, &texture_creator, "Press Enter to start", 0, 255, 128, (width as i32)/2-200, (height as i32)/2+250, wm, hm);
+                Util::textOut(canvas, &font, &texture_creator, "Escape to exit", 0, 255, 128, (width as i32)/2-140, (height as i32)/2+300, wm, hm);
             }
             GameState::START => {
                 // スコアをクリア
@@ -323,11 +325,11 @@ impl Game {
                 canvas.set_draw_color(Color::RGB(0, 0, 0)); // black
                 canvas.clear();
 
-                let wl: i32 = 50;
-                let hl: i32 = 70;
+                let wl: i32 = 100;
+                let hl: i32 = 130;
                 let wm: i32 = 20;
                 let hm: i32 = 30;
-                Util::textOut(canvas, &font, &texture_creator, "Game Over", 0, 255, 128, (width as i32)/2-wl*4, (height as i32)/2-hl/2, wl as u32, hl as u32);
+                Util::textOut(canvas, &font, &texture_creator, "Game Over", 0, 255, 128, (width as i32)/2-wl*5, (height as i32)/2-hl/2, wl as u32, hl as u32);
                 Util::textOut(canvas, &font, &texture_creator, &format!("Score: {}", self.score), 0, 255, 128, (width as i32)/2-wm*5, (height as i32)/2+hm*2, 15, 30);
 
                 // update & draw asteroids
