@@ -39,6 +39,8 @@ fn main() {
 
     // 1つのキャラクター画像のピクセルサイズ
     let IMGW: u32 = 26;
+    let magRatio: f64 = 2.5;
+    let IMGW_DEST: u32 = ((IMGW as f64) * magRatio) as u32;
 
     // 位置
     let mut x = (width/2) as i32;
@@ -105,12 +107,12 @@ fn main() {
         // update position
         x += dx;
         y += dy;
-        x = if x<0 { 0 } else if x>=((width - IMGW) as i32) { (width - IMGW) as i32 } else { x };
-        y = if y<0 { 0 } else if y>=((height - IMGW) as i32) { (height - IMGW) as i32 } else { y };
+        x = if x<0 { 0 } else if x>=((width - IMGW_DEST) as i32) { (width - IMGW_DEST) as i32 } else { x };
+        y = if y<0 { 0 } else if y>=((height - IMGW_DEST) as i32) { (height - IMGW_DEST) as i32 } else { y };
 
         // draw monster
         let src: Rect = Rect::new(((monster as u32)*(IMGW*4)+(dirInd as u32)*IMGW) as i32, (IMGW*1) as i32, IMGW, IMGW);
-        let dest: Rect = Rect::new(x, y, IMGW, IMGW);
+        let dest: Rect = Rect::new(x, y, IMGW_DEST, IMGW_DEST);
         canvas.copy(&image_texture, Some(src), Some(dest)).expect("copy texture to canvas failed");
 
         canvas.present();
