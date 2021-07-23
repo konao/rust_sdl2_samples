@@ -10,6 +10,10 @@ Line-art animation
 
 Image file (jpg) display
 
+## **anim**
+
+Simple animation
+
 ## **asteroid**
 
 Good-old space shooter
