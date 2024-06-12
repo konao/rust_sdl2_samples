@@ -123,7 +123,7 @@ fn main() {
     let mut entities = Vec::new();
     let N = 32;
     for i in 0..N {
-        let mut ent = Entity::new(
+        let ent = Entity::new(
             (w as f64)/2.0, 
             (h as f64)/2.0,
             R,

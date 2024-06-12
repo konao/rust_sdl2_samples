@@ -139,7 +139,7 @@ impl MyShip {
 
         let N = 12;
         for i in 0..N {
-            let mut theta: f64 = Util::deg2rad(360.0 * (i as f64) / (N as f64) + (self.explosionAnimCount as f64) * 2.0);
+            let theta: f64 = Util::deg2rad(360.0 * (i as f64) / (N as f64) + (self.explosionAnimCount as f64) * 2.0);
             let cp: Point = Point::new((x+er*theta.cos()) as i32, (y+er*theta.sin()) as i32);
 
             let ro1 = Util::deg2rad((self.explosionAnimCount as f64) * 5.0);

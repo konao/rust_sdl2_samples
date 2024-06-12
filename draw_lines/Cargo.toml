@@ -6,4 +6,5 @@ authors = ["Takuya Sekikawa <konao235@gmail.com>"]
 [dependencies]
 # このバージョンでないと成功しなかった
 # ("0.34.2"が最新だったが、unstable editionとか何とか言われてコンパイルできなかった)
-sdl2 = "0.30.0"
+# sdl2 = "0.30.0"
+sdl2 = "0.36.0"
