@@ -6,6 +6,9 @@
 //  ボールの透過色の設定は、pngファイル特有のtransparent colorを使っている
 //  (JPEGではできない)
 //
+//  pngの透過色の設定は以下のサイトで行った（フリー）
+//  https://onlinepngtools.com/create-transparent-png
+//
 //  2024/6/25 konao
 // *****************************************************************
 #![allow(non_snake_case)]
