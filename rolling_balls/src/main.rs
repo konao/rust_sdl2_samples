@@ -60,8 +60,10 @@ impl Ball {
     pub fn update(&mut self) {
         let vx = self.radius * self.theta.cos();
         let vy = self.radius * self.theta.sin();
-        self.x = vx * self.t.sin() + self.cx;
-        self.y = vy * self.t.sin() + self.cy;
+
+        // ★の2行は両方ともsinまたはcosにすること
+        self.x = vx * self.t.sin() + self.cx;   // ★（cosの間違いではない．sinで正しい）
+        self.y = vy * self.t.sin() + self.cy;   // ★
         self.t += self.dt;
     }
 }

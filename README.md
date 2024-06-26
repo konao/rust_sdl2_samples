@@ -14,6 +14,10 @@ Image file (jpg) display
 
 Simple animation
 
+## **rolling_balls**
+
+Rolling ball's illusion
+
 ## **asteroid**
 
 Good-old space shooter
